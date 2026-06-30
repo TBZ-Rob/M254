@@ -1,0 +1,1094 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1jwbyvh" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.47.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.9.0">
+  <bpmn:collaboration id="Collaboration_1knlcmn">
+    <bpmn:participant id="Participant_06fyet6" name="Kunde" processRef="Process_0t4z7yo" />
+    <bpmn:participant id="Participant_0mo5q8b" name="Kellner" processRef="Process_14ksr0u" />
+    <bpmn:participant id="Participant_kueche" name="Küche" processRef="Process_kueche" />
+    <bpmn:messageFlow id="Flow_1l7fvpo" sourceRef="Activity_0ked57j" targetRef="Event_067sc5w" />
+    <bpmn:messageFlow id="Flow_0x1x3bn" sourceRef="Activity_1cisz2d" targetRef="Event_1f4z5gb" />
+    <bpmn:messageFlow id="Flow_0u5mnl0" sourceRef="Activity_1uftjxr" targetRef="Event_01lbt6a" />
+    <bpmn:messageFlow id="Flow_1u85r12" sourceRef="Activity_05poycg" targetRef="Event_0pogi69" />
+    <bpmn:messageFlow id="Flow_1bsop1w" sourceRef="Activity_193kv8q" targetRef="Event_08iaokd" />
+    <bpmn:messageFlow id="Flow_0p1bbym" sourceRef="Activity_0dkaeh2" targetRef="Event_1a4vlk9" />
+    <bpmn:messageFlow id="MF_vor" sourceRef="Act_w_vor_serv" targetRef="Ev_k_vor_serviert" />
+    <bpmn:messageFlow id="MF_haupt" sourceRef="Act_w_haupt_serv" targetRef="Ev_k_haupt_serviert" />
+    <bpmn:messageFlow id="MF_des" sourceRef="Act_w_des_serv" targetRef="Ev_k_des_serviert" />
+    <bpmn:messageFlow id="MF_rechreq" sourceRef="Act_k_rechnung" targetRef="Ev_w_rech_anfrage" />
+    <bpmn:messageFlow id="MF_rechbring" sourceRef="Act_w_rech_bringen" targetRef="Ev_k_rechnung" />
+    <bpmn:messageFlow id="MF_ku_order" sourceRef="Act_w_kueche" targetRef="Ev_ku_start" />
+    <bpmn:messageFlow id="MF_ku_fertig" sourceRef="Act_ku_fertig" targetRef="Ev_w_kueche_fertig" />
+  </bpmn:collaboration>
+  <bpmn:message id="Message_TischZugewiesen" name="TischZugewiesen">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=bestellId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_GetraenkFrage" name="KellnerFragtGetraenk">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=bestellId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_BestellungAufnehmen" name="KellnerNimmtBestellungAuf">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=bestellId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_VorspeiseServiert" name="VorspeiseServiert">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=bestellId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_HauptgangServiert" name="HauptgangServiert">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=bestellId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_DessertServiert" name="DessertServiert">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=bestellId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_RechnungGebracht" name="RechnungGebracht">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=bestellId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:process id="Process_0t4z7yo" isExecutable="true">
+    <bpmn:startEvent id="Event_0pft8do" name="Hunger o.ä">
+      <bpmn:outgoing>Flow_0sfwfu4</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_0ked57j" name="Restaurant betreten">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="restaurant-betreten" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0sfwfu4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yb79dn</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="Event_1f4z5gb" name="Tisch zugewiesen">
+      <bpmn:incoming>Flow_0yb79dn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qou19c</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0rqdrri" messageRef="Message_TischZugewiesen" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Activity_0q1h0tk" name="An Tisch setzen">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="platz-nehmen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0qou19c</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wpj9xd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="Event_01lbt6a" name="Welches Getränk?">
+      <bpmn:incoming>Flow_0wpj9xd</bpmn:incoming>
+      <bpmn:outgoing>Flow_12iqnol</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0tjqlrt" messageRef="Message_GetraenkFrage" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="Activity_05poycg" name="Getränk bestellen">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_12iqnol</bpmn:incoming>
+      <bpmn:outgoing>Flow_0n3vn5s</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Activity_0oa5gn3" name="Essen aussuchen">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0n3vn5s</bpmn:incoming>
+      <bpmn:outgoing>Flow_0r50jqm</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:intermediateCatchEvent id="Event_08iaokd" name="Auf Kellner warten">
+      <bpmn:incoming>Flow_0r50jqm</bpmn:incoming>
+      <bpmn:outgoing>Flow_110o59f</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0qi456m" messageRef="Message_BestellungAufnehmen" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Activity_0dkaeh2" name="Bestellung aufgeben">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="bestellung-aufgeben" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_110o59f</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dk_gw</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gw_k_vorspeise" name="Vorspeise gewünscht?" default="F_k_vor_nein">
+      <bpmn:incoming>Flow_0dk_gw</bpmn:incoming>
+      <bpmn:outgoing>F_k_vor_ja</bpmn:outgoing>
+      <bpmn:outgoing>F_k_vor_nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="Ev_k_vor_serviert" name="Vorspeise serviert">
+      <bpmn:incoming>F_k_vor_ja</bpmn:incoming>
+      <bpmn:outgoing>F_k_vor_essen</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_k_vor" messageRef="Message_VorspeiseServiert" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Act_k_vor_essen" name="Vorspeise essen">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="vorspeise-essen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_vor_essen</bpmn:incoming>
+      <bpmn:outgoing>F_k_vor_join</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gw_k_vorspeise_j">
+      <bpmn:incoming>F_k_vor_join</bpmn:incoming>
+      <bpmn:incoming>F_k_vor_nein</bpmn:incoming>
+      <bpmn:outgoing>F_k_haupt1</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="Ev_k_haupt_serviert" name="Hauptgang serviert">
+      <bpmn:incoming>F_k_haupt1</bpmn:incoming>
+      <bpmn:outgoing>F_k_haupt2</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_k_haupt" messageRef="Message_HauptgangServiert" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Act_k_haupt_essen" name="Hauptgang essen">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="hauptgang-essen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_haupt2</bpmn:incoming>
+      <bpmn:outgoing>F_k_haupt3</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Act_k_dessert_wahl" name="Dessert wählen">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_haupt3</bpmn:incoming>
+      <bpmn:outgoing>F_k_des_gw</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gw_k_dessert" name="Dessert gewünscht?" default="F_k_des_nein">
+      <bpmn:incoming>F_k_des_gw</bpmn:incoming>
+      <bpmn:outgoing>F_k_des_ja</bpmn:outgoing>
+      <bpmn:outgoing>F_k_des_nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="Ev_k_des_serviert" name="Dessert serviert">
+      <bpmn:incoming>F_k_des_ja</bpmn:incoming>
+      <bpmn:outgoing>F_k_des_essen</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_k_des" messageRef="Message_DessertServiert" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Act_k_des_essen" name="Dessert essen">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="dessert-essen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_des_essen</bpmn:incoming>
+      <bpmn:outgoing>F_k_des_join</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gw_k_dessert_j">
+      <bpmn:incoming>F_k_des_join</bpmn:incoming>
+      <bpmn:incoming>F_k_des_nein</bpmn:incoming>
+      <bpmn:outgoing>F_k_rech1</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Act_k_rechnung" name="Rechnung verlangen">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="rechnung-verlangen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_rech1</bpmn:incoming>
+      <bpmn:outgoing>F_k_rech2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateCatchEvent id="Ev_k_rechnung" name="Rechnung erhalten">
+      <bpmn:incoming>F_k_rech2</bpmn:incoming>
+      <bpmn:outgoing>F_k_rech3</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_k_rech" messageRef="Message_RechnungGebracht" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="Act_k_zahlart" name="Zahlungsart wählen">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_rech3</bpmn:incoming>
+      <bpmn:outgoing>F_k_zahl_gw</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gw_k_zahlung" name="Bar oder Karte?" default="F_k_zahl_karte">
+      <bpmn:incoming>F_k_zahl_gw</bpmn:incoming>
+      <bpmn:outgoing>F_k_zahl_bar</bpmn:outgoing>
+      <bpmn:outgoing>F_k_zahl_karte</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Act_k_bar" name="Bar bezahlen">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="bar-bezahlen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_zahl_bar</bpmn:incoming>
+      <bpmn:outgoing>F_k_bar_join</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Act_k_karte" name="Mit Karte bezahlen">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="karte-bezahlen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_zahl_karte</bpmn:incoming>
+      <bpmn:outgoing>F_k_karte_join</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gw_k_zahlung_j">
+      <bpmn:incoming>F_k_bar_join</bpmn:incoming>
+      <bpmn:incoming>F_k_karte_join</bpmn:incoming>
+      <bpmn:outgoing>F_k_tip_gw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Act_k_tip_wahl" name="Trinkgeld festlegen">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_tip_gw</bpmn:incoming>
+      <bpmn:outgoing>F_k_tip_gw2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gw_k_tip" name="Trinkgeld geben?" default="F_k_tip_nein">
+      <bpmn:incoming>F_k_tip_gw2</bpmn:incoming>
+      <bpmn:outgoing>F_k_tip_ja</bpmn:outgoing>
+      <bpmn:outgoing>F_k_tip_nein</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Act_k_tip_geben" name="Trinkgeld geben">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="trinkgeld-geben" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_tip_ja</bpmn:incoming>
+      <bpmn:outgoing>F_k_tip_join</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gw_k_tip_j">
+      <bpmn:incoming>F_k_tip_join</bpmn:incoming>
+      <bpmn:incoming>F_k_tip_nein</bpmn:incoming>
+      <bpmn:outgoing>F_k_verl</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Act_k_verlassen" name="Restaurant verlassen">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="restaurant-verlassen" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_k_verl</bpmn:incoming>
+      <bpmn:outgoing>F_k_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Ev_k_end" name="Besuch abgeschlossen">
+      <bpmn:incoming>F_k_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0sfwfu4" sourceRef="Event_0pft8do" targetRef="Activity_0ked57j" />
+    <bpmn:sequenceFlow id="Flow_0yb79dn" sourceRef="Activity_0ked57j" targetRef="Event_1f4z5gb" />
+    <bpmn:sequenceFlow id="Flow_0qou19c" sourceRef="Event_1f4z5gb" targetRef="Activity_0q1h0tk" />
+    <bpmn:sequenceFlow id="Flow_0wpj9xd" sourceRef="Activity_0q1h0tk" targetRef="Event_01lbt6a" />
+    <bpmn:sequenceFlow id="Flow_12iqnol" sourceRef="Event_01lbt6a" targetRef="Activity_05poycg" />
+    <bpmn:sequenceFlow id="Flow_0n3vn5s" sourceRef="Activity_05poycg" targetRef="Activity_0oa5gn3" />
+    <bpmn:sequenceFlow id="Flow_0r50jqm" sourceRef="Activity_0oa5gn3" targetRef="Event_08iaokd" />
+    <bpmn:sequenceFlow id="Flow_110o59f" sourceRef="Event_08iaokd" targetRef="Activity_0dkaeh2" />
+    <bpmn:sequenceFlow id="Flow_0dk_gw" sourceRef="Activity_0dkaeh2" targetRef="Gw_k_vorspeise" />
+    <bpmn:sequenceFlow id="F_k_vor_ja" name="Ja" sourceRef="Gw_k_vorspeise" targetRef="Ev_k_vor_serviert">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=vorspeiseGewuenscht = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_k_vor_essen" sourceRef="Ev_k_vor_serviert" targetRef="Act_k_vor_essen" />
+    <bpmn:sequenceFlow id="F_k_vor_join" sourceRef="Act_k_vor_essen" targetRef="Gw_k_vorspeise_j" />
+    <bpmn:sequenceFlow id="F_k_vor_nein" name="Nein" sourceRef="Gw_k_vorspeise" targetRef="Gw_k_vorspeise_j" />
+    <bpmn:sequenceFlow id="F_k_haupt1" sourceRef="Gw_k_vorspeise_j" targetRef="Ev_k_haupt_serviert" />
+    <bpmn:sequenceFlow id="F_k_haupt2" sourceRef="Ev_k_haupt_serviert" targetRef="Act_k_haupt_essen" />
+    <bpmn:sequenceFlow id="F_k_haupt3" sourceRef="Act_k_haupt_essen" targetRef="Act_k_dessert_wahl" />
+    <bpmn:sequenceFlow id="F_k_des_gw" sourceRef="Act_k_dessert_wahl" targetRef="Gw_k_dessert" />
+    <bpmn:sequenceFlow id="F_k_des_ja" name="Ja" sourceRef="Gw_k_dessert" targetRef="Ev_k_des_serviert">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=dessertGewuenscht = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_k_des_essen" sourceRef="Ev_k_des_serviert" targetRef="Act_k_des_essen" />
+    <bpmn:sequenceFlow id="F_k_des_join" sourceRef="Act_k_des_essen" targetRef="Gw_k_dessert_j" />
+    <bpmn:sequenceFlow id="F_k_des_nein" name="Nein" sourceRef="Gw_k_dessert" targetRef="Gw_k_dessert_j" />
+    <bpmn:sequenceFlow id="F_k_rech1" sourceRef="Gw_k_dessert_j" targetRef="Act_k_rechnung" />
+    <bpmn:sequenceFlow id="F_k_rech2" sourceRef="Act_k_rechnung" targetRef="Ev_k_rechnung" />
+    <bpmn:sequenceFlow id="F_k_rech3" sourceRef="Ev_k_rechnung" targetRef="Act_k_zahlart" />
+    <bpmn:sequenceFlow id="F_k_zahl_gw" sourceRef="Act_k_zahlart" targetRef="Gw_k_zahlung" />
+    <bpmn:sequenceFlow id="F_k_zahl_bar" name="Bar" sourceRef="Gw_k_zahlung" targetRef="Act_k_bar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=zahlungsart = "bar"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_k_bar_join" sourceRef="Act_k_bar" targetRef="Gw_k_zahlung_j" />
+    <bpmn:sequenceFlow id="F_k_zahl_karte" name="Karte" sourceRef="Gw_k_zahlung" targetRef="Act_k_karte" />
+    <bpmn:sequenceFlow id="F_k_karte_join" sourceRef="Act_k_karte" targetRef="Gw_k_zahlung_j" />
+    <bpmn:sequenceFlow id="F_k_tip_gw" sourceRef="Gw_k_zahlung_j" targetRef="Act_k_tip_wahl" />
+    <bpmn:sequenceFlow id="F_k_tip_gw2" sourceRef="Act_k_tip_wahl" targetRef="Gw_k_tip" />
+    <bpmn:sequenceFlow id="F_k_tip_ja" name="Ja" sourceRef="Gw_k_tip" targetRef="Act_k_tip_geben">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=trinkgeldProzent &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_k_tip_join" sourceRef="Act_k_tip_geben" targetRef="Gw_k_tip_j" />
+    <bpmn:sequenceFlow id="F_k_tip_nein" name="Nein" sourceRef="Gw_k_tip" targetRef="Gw_k_tip_j" />
+    <bpmn:sequenceFlow id="F_k_verl" sourceRef="Gw_k_tip_j" targetRef="Act_k_verlassen" />
+    <bpmn:sequenceFlow id="F_k_end" sourceRef="Act_k_verlassen" targetRef="Ev_k_end" />
+  </bpmn:process>
+  <bpmn:process id="Process_14ksr0u" isExecutable="false">
+    <bpmn:startEvent id="Event_067sc5w" name="Gast betritt Restaurant">
+      <bpmn:outgoing>Flow_1vxovuk</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0qpz11y" />
+    </bpmn:startEvent>
+    <bpmn:task id="Activity_0p45is1" name="Freien Platz prüfen">
+      <bpmn:incoming>Flow_1vxovuk</bpmn:incoming>
+      <bpmn:outgoing>Flow_1nub9v5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_0u02q63" name="Genug Plätze frei?">
+      <bpmn:incoming>Flow_1nub9v5</bpmn:incoming>
+      <bpmn:outgoing>Flow_0obqlmr</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1njhpym</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Activity_07ca4wr" name="Mitteilen: kein Platz frei">
+      <bpmn:incoming>Flow_0obqlmr</bpmn:incoming>
+      <bpmn:outgoing>F_w_kp_end</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="Ev_kellner_kein_platz" name="Kein Platz">
+      <bpmn:incoming>F_w_kp_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Activity_1cisz2d" name="Kunden an Tisch führen, Karte überreichen">
+      <bpmn:incoming>Flow_1njhpym</bpmn:incoming>
+      <bpmn:outgoing>Flow_0pkkju6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_1uftjxr" name="Kunden nach Getränk fragen">
+      <bpmn:incoming>Flow_0pkkju6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1t8nt07</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="Event_0pogi69" name="Kunde hat Getränk gewählt">
+      <bpmn:incoming>Flow_1t8nt07</bpmn:incoming>
+      <bpmn:outgoing>Flow_03yqkre</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0l84mrn" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="Activity_13q1q3t" name="Getränk zum Kunden bringen">
+      <bpmn:incoming>Flow_03yqkre</bpmn:incoming>
+      <bpmn:outgoing>Flow_1emdvkc</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="Event_0bqf6uk" name="5-8 min warten">
+      <bpmn:incoming>Flow_1emdvkc</bpmn:incoming>
+      <bpmn:outgoing>Flow_174gmv7</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0y5eq88" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="Activity_193kv8q" name="Bestellung aufnehmen">
+      <bpmn:incoming>Flow_174gmv7</bpmn:incoming>
+      <bpmn:outgoing>Flow_0uyp2uf</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="Event_1a4vlk9" name="Bestellung erhalten">
+      <bpmn:incoming>Flow_0uyp2uf</bpmn:incoming>
+      <bpmn:outgoing>Flow_07z0c7k</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_129x3uc" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway id="Gateway_0l0kv5b" name="Vorspeise gewünscht?">
+      <bpmn:incoming>Flow_07z0c7k</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jgh3e8</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0aqqjkt</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Activity_1cszl10" name="Vorspeise aufnehmen">
+      <bpmn:incoming>Flow_1jgh3e8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kol4h5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_13w4j2b">
+      <bpmn:incoming>Flow_0kol4h5</bpmn:incoming>
+      <bpmn:incoming>Flow_0aqqjkt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xq8uge</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Activity_0u3d9gf" name="Hauptgang aufnehmen">
+      <bpmn:incoming>Flow_0xq8uge</bpmn:incoming>
+      <bpmn:outgoing>F_w_kueche</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Act_w_kueche" name="Bestellung eintippen (iPad)">
+      <bpmn:incoming>F_w_kueche</bpmn:incoming>
+      <bpmn:outgoing>F_w_kfertig</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="Ev_w_kueche_fertig" name="Bestellung fertig">
+      <bpmn:incoming>F_w_kfertig</bpmn:incoming>
+      <bpmn:outgoing>F_w_vor</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_w_kfertig" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="Act_w_vor_serv" name="Vorspeise servieren">
+      <bpmn:incoming>F_w_vor</bpmn:incoming>
+      <bpmn:outgoing>F_w_haupt</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Act_w_haupt_serv" name="Hauptgang servieren">
+      <bpmn:incoming>F_w_haupt</bpmn:incoming>
+      <bpmn:outgoing>F_w_des</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Act_w_des_serv" name="Dessert servieren">
+      <bpmn:incoming>F_w_des</bpmn:incoming>
+      <bpmn:outgoing>F_w_rechwait</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="Ev_w_rech_anfrage" name="Rechnung angefragt">
+      <bpmn:incoming>F_w_rechwait</bpmn:incoming>
+      <bpmn:outgoing>F_w_rechbring</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_w_rech" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="Act_w_rech_bringen" name="Rechnung bringen">
+      <bpmn:incoming>F_w_rechbring</bpmn:incoming>
+      <bpmn:outgoing>F_w_zahl</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Act_w_zahlung" name="Zahlung entgegennehmen">
+      <bpmn:incoming>F_w_zahl</bpmn:incoming>
+      <bpmn:outgoing>F_w_verab</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Act_w_verabsch" name="Gäste verabschieden">
+      <bpmn:incoming>F_w_verab</bpmn:incoming>
+      <bpmn:outgoing>F_w_end</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="Ev_w_end" name="Gast verabschiedet">
+      <bpmn:incoming>F_w_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1vxovuk" sourceRef="Event_067sc5w" targetRef="Activity_0p45is1" />
+    <bpmn:sequenceFlow id="Flow_1nub9v5" sourceRef="Activity_0p45is1" targetRef="Gateway_0u02q63" />
+    <bpmn:sequenceFlow id="Flow_0obqlmr" name="Nein" sourceRef="Gateway_0u02q63" targetRef="Activity_07ca4wr" />
+    <bpmn:sequenceFlow id="F_w_kp_end" sourceRef="Activity_07ca4wr" targetRef="Ev_kellner_kein_platz" />
+    <bpmn:sequenceFlow id="Flow_1njhpym" name="Ja" sourceRef="Gateway_0u02q63" targetRef="Activity_1cisz2d" />
+    <bpmn:sequenceFlow id="Flow_0pkkju6" sourceRef="Activity_1cisz2d" targetRef="Activity_1uftjxr" />
+    <bpmn:sequenceFlow id="Flow_1t8nt07" sourceRef="Activity_1uftjxr" targetRef="Event_0pogi69" />
+    <bpmn:sequenceFlow id="Flow_03yqkre" sourceRef="Event_0pogi69" targetRef="Activity_13q1q3t" />
+    <bpmn:sequenceFlow id="Flow_1emdvkc" sourceRef="Activity_13q1q3t" targetRef="Event_0bqf6uk" />
+    <bpmn:sequenceFlow id="Flow_174gmv7" sourceRef="Event_0bqf6uk" targetRef="Activity_193kv8q" />
+    <bpmn:sequenceFlow id="Flow_0uyp2uf" sourceRef="Activity_193kv8q" targetRef="Event_1a4vlk9" />
+    <bpmn:sequenceFlow id="Flow_07z0c7k" sourceRef="Event_1a4vlk9" targetRef="Gateway_0l0kv5b" />
+    <bpmn:sequenceFlow id="Flow_1jgh3e8" name="Ja" sourceRef="Gateway_0l0kv5b" targetRef="Activity_1cszl10" />
+    <bpmn:sequenceFlow id="Flow_0kol4h5" sourceRef="Activity_1cszl10" targetRef="Gateway_13w4j2b" />
+    <bpmn:sequenceFlow id="Flow_0aqqjkt" name="Nein" sourceRef="Gateway_0l0kv5b" targetRef="Gateway_13w4j2b" />
+    <bpmn:sequenceFlow id="Flow_0xq8uge" sourceRef="Gateway_13w4j2b" targetRef="Activity_0u3d9gf" />
+    <bpmn:sequenceFlow id="F_w_kueche" sourceRef="Activity_0u3d9gf" targetRef="Act_w_kueche" />
+    <bpmn:sequenceFlow id="F_w_kfertig" sourceRef="Act_w_kueche" targetRef="Ev_w_kueche_fertig" />
+    <bpmn:sequenceFlow id="F_w_vor" sourceRef="Ev_w_kueche_fertig" targetRef="Act_w_vor_serv" />
+    <bpmn:sequenceFlow id="F_w_haupt" sourceRef="Act_w_vor_serv" targetRef="Act_w_haupt_serv" />
+    <bpmn:sequenceFlow id="F_w_des" sourceRef="Act_w_haupt_serv" targetRef="Act_w_des_serv" />
+    <bpmn:sequenceFlow id="F_w_rechwait" sourceRef="Act_w_des_serv" targetRef="Ev_w_rech_anfrage" />
+    <bpmn:sequenceFlow id="F_w_rechbring" sourceRef="Ev_w_rech_anfrage" targetRef="Act_w_rech_bringen" />
+    <bpmn:sequenceFlow id="F_w_zahl" sourceRef="Act_w_rech_bringen" targetRef="Act_w_zahlung" />
+    <bpmn:sequenceFlow id="F_w_verab" sourceRef="Act_w_zahlung" targetRef="Act_w_verabsch" />
+    <bpmn:sequenceFlow id="F_w_end" sourceRef="Act_w_verabsch" targetRef="Ev_w_end" />
+  </bpmn:process>
+  <bpmn:process id="Process_kueche" isExecutable="false">
+    <bpmn:startEvent id="Ev_ku_start" name="Bestellung erhalten">
+      <bpmn:outgoing>F_ku_1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_ku_start" />
+    </bpmn:startEvent>
+    <bpmn:task id="Act_ku_zubereiten" name="Gerichte zubereiten">
+      <bpmn:incoming>F_ku_1</bpmn:incoming>
+      <bpmn:outgoing>F_ku_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Act_ku_anrichten" name="Gericht anrichten / hinstellen">
+      <bpmn:incoming>F_ku_2</bpmn:incoming>
+      <bpmn:outgoing>F_ku_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Act_ku_fertig" name="Als fertig markieren">
+      <bpmn:incoming>F_ku_3</bpmn:incoming>
+      <bpmn:outgoing>F_ku_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="Ev_ku_end" name="Bestellung bereit">
+      <bpmn:incoming>F_ku_4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F_ku_1" sourceRef="Ev_ku_start" targetRef="Act_ku_zubereiten" />
+    <bpmn:sequenceFlow id="F_ku_2" sourceRef="Act_ku_zubereiten" targetRef="Act_ku_anrichten" />
+    <bpmn:sequenceFlow id="F_ku_3" sourceRef="Act_ku_anrichten" targetRef="Act_ku_fertig" />
+    <bpmn:sequenceFlow id="F_ku_4" sourceRef="Act_ku_fertig" targetRef="Ev_ku_end" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1knlcmn">
+      <bpmndi:BPMNShape id="Participant_06fyet6_di" bpmnElement="Participant_06fyet6" isHorizontal="true">
+        <dc:Bounds x="110" y="80" width="5655" height="380" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_0mo5q8b_di" bpmnElement="Participant_0mo5q8b" isHorizontal="true">
+        <dc:Bounds x="110" y="520" width="5655" height="380" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_kueche_di" bpmnElement="Participant_kueche" isHorizontal="true">
+        <dc:Bounds x="110" y="920" width="5655" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pft8do_di" bpmnElement="Event_0pft8do">
+        <dc:Bounds x="222" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="195" y="223" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ked57j_di" bpmnElement="Activity_0ked57j">
+        <dc:Bounds x="365" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1f4z5gb_di" bpmnElement="Event_1f4z5gb">
+        <dc:Bounds x="572" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="545" y="223" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0q1h0tk_di" bpmnElement="Activity_0q1h0tk">
+        <dc:Bounds x="715" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_01lbt6a_di" bpmnElement="Event_01lbt6a">
+        <dc:Bounds x="922" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="895" y="223" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05poycg_di" bpmnElement="Activity_05poycg">
+        <dc:Bounds x="1065" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0oa5gn3_di" bpmnElement="Activity_0oa5gn3">
+        <dc:Bounds x="1240" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_08iaokd_di" bpmnElement="Event_08iaokd">
+        <dc:Bounds x="1447" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1420" y="223" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dkaeh2_di" bpmnElement="Activity_0dkaeh2">
+        <dc:Bounds x="1590" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_k_vorspeise_di" bpmnElement="Gw_k_vorspeise">
+        <dc:Bounds x="1790" y="175" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1770" y="145" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_k_vor_serviert_di" bpmnElement="Ev_k_vor_serviert">
+        <dc:Bounds x="1972" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1945" y="383" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_vor_essen_di" bpmnElement="Act_k_vor_essen">
+        <dc:Bounds x="2115" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_k_vorspeise_j_di" bpmnElement="Gw_k_vorspeise_j">
+        <dc:Bounds x="2315" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_k_haupt_serviert_di" bpmnElement="Ev_k_haupt_serviert">
+        <dc:Bounds x="2497" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2470" y="223" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_haupt_essen_di" bpmnElement="Act_k_haupt_essen">
+        <dc:Bounds x="2640" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_dessert_wahl_di" bpmnElement="Act_k_dessert_wahl">
+        <dc:Bounds x="2815" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_k_dessert_di" bpmnElement="Gw_k_dessert">
+        <dc:Bounds x="3015" y="175" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2995" y="145" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_k_des_serviert_di" bpmnElement="Ev_k_des_serviert">
+        <dc:Bounds x="3197" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3170" y="383" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_des_essen_di" bpmnElement="Act_k_des_essen">
+        <dc:Bounds x="3340" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_k_dessert_j_di" bpmnElement="Gw_k_dessert_j">
+        <dc:Bounds x="3540" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_rechnung_di" bpmnElement="Act_k_rechnung">
+        <dc:Bounds x="3690" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_k_rechnung_di" bpmnElement="Ev_k_rechnung">
+        <dc:Bounds x="3897" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3870" y="223" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_zahlart_di" bpmnElement="Act_k_zahlart">
+        <dc:Bounds x="4040" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_k_zahlung_di" bpmnElement="Gw_k_zahlung">
+        <dc:Bounds x="4240" y="175" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4220" y="145" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_bar_di" bpmnElement="Act_k_bar">
+        <dc:Bounds x="4390" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_karte_di" bpmnElement="Act_k_karte">
+        <dc:Bounds x="4390" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_k_zahlung_j_di" bpmnElement="Gw_k_zahlung_j">
+        <dc:Bounds x="4590" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_tip_wahl_di" bpmnElement="Act_k_tip_wahl">
+        <dc:Bounds x="4740" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_k_tip_di" bpmnElement="Gw_k_tip">
+        <dc:Bounds x="4940" y="175" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4920" y="145" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_tip_geben_di" bpmnElement="Act_k_tip_geben">
+        <dc:Bounds x="5090" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gw_k_tip_j_di" bpmnElement="Gw_k_tip_j">
+        <dc:Bounds x="5290" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_k_verlassen_di" bpmnElement="Act_k_verlassen">
+        <dc:Bounds x="5440" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_k_end_di" bpmnElement="Ev_k_end">
+        <dc:Bounds x="5647" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="5620" y="223" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_067sc5w_di" bpmnElement="Event_067sc5w">
+        <dc:Bounds x="222" y="622" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="195" y="663" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0p45is1_di" bpmnElement="Activity_0p45is1">
+        <dc:Bounds x="365" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0u02q63_di" bpmnElement="Gateway_0u02q63">
+        <dc:Bounds x="565" y="615" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="545" y="585" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_07ca4wr_di" bpmnElement="Activity_07ca4wr">
+        <dc:Bounds x="715" y="760" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_kellner_kein_platz_di" bpmnElement="Ev_kellner_kein_platz">
+        <dc:Bounds x="922" y="782" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="895" y="823" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1cisz2d_di" bpmnElement="Activity_1cisz2d">
+        <dc:Bounds x="715" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1uftjxr_di" bpmnElement="Activity_1uftjxr">
+        <dc:Bounds x="890" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pogi69_di" bpmnElement="Event_0pogi69">
+        <dc:Bounds x="1097" y="622" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1070" y="663" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13q1q3t_di" bpmnElement="Activity_13q1q3t">
+        <dc:Bounds x="1240" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0bqf6uk_di" bpmnElement="Event_0bqf6uk">
+        <dc:Bounds x="1447" y="622" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1420" y="663" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_193kv8q_di" bpmnElement="Activity_193kv8q">
+        <dc:Bounds x="1590" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1a4vlk9_di" bpmnElement="Event_1a4vlk9">
+        <dc:Bounds x="1797" y="622" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1770" y="663" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0l0kv5b_di" bpmnElement="Gateway_0l0kv5b">
+        <dc:Bounds x="1965" y="615" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1945" y="585" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1cszl10_di" bpmnElement="Activity_1cszl10">
+        <dc:Bounds x="2115" y="760" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_13w4j2b_di" bpmnElement="Gateway_13w4j2b">
+        <dc:Bounds x="2315" y="615" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u3d9gf_di" bpmnElement="Activity_0u3d9gf">
+        <dc:Bounds x="2465" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_w_kueche_di" bpmnElement="Act_w_kueche">
+        <dc:Bounds x="2640" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_w_kueche_fertig_di" bpmnElement="Ev_w_kueche_fertig">
+        <dc:Bounds x="2847" y="622" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2820" y="663" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_w_vor_serv_di" bpmnElement="Act_w_vor_serv">
+        <dc:Bounds x="2990" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_w_haupt_serv_di" bpmnElement="Act_w_haupt_serv">
+        <dc:Bounds x="3165" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_w_des_serv_di" bpmnElement="Act_w_des_serv">
+        <dc:Bounds x="3340" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_w_rech_anfrage_di" bpmnElement="Ev_w_rech_anfrage">
+        <dc:Bounds x="3547" y="622" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3520" y="663" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_w_rech_bringen_di" bpmnElement="Act_w_rech_bringen">
+        <dc:Bounds x="3690" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_w_zahlung_di" bpmnElement="Act_w_zahlung">
+        <dc:Bounds x="3865" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_w_verabsch_di" bpmnElement="Act_w_verabsch">
+        <dc:Bounds x="4040" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_w_end_di" bpmnElement="Ev_w_end">
+        <dc:Bounds x="4247" y="622" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4220" y="663" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_ku_start_di" bpmnElement="Ev_ku_start">
+        <dc:Bounds x="222" y="992" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="195" y="1033" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_ku_zubereiten_di" bpmnElement="Act_ku_zubereiten">
+        <dc:Bounds x="365" y="970" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_ku_anrichten_di" bpmnElement="Act_ku_anrichten">
+        <dc:Bounds x="540" y="970" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Act_ku_fertig_di" bpmnElement="Act_ku_fertig">
+        <dc:Bounds x="715" y="970" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ev_ku_end_di" bpmnElement="Ev_ku_end">
+        <dc:Bounds x="922" y="992" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="895" y="1033" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0sfwfu4_di" bpmnElement="Flow_0sfwfu4">
+        <di:waypoint x="258" y="200" />
+        <di:waypoint x="365" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yb79dn_di" bpmnElement="Flow_0yb79dn">
+        <di:waypoint x="465" y="200" />
+        <di:waypoint x="572" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qou19c_di" bpmnElement="Flow_0qou19c">
+        <di:waypoint x="608" y="200" />
+        <di:waypoint x="715" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wpj9xd_di" bpmnElement="Flow_0wpj9xd">
+        <di:waypoint x="815" y="200" />
+        <di:waypoint x="922" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12iqnol_di" bpmnElement="Flow_12iqnol">
+        <di:waypoint x="958" y="200" />
+        <di:waypoint x="1065" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0n3vn5s_di" bpmnElement="Flow_0n3vn5s">
+        <di:waypoint x="1165" y="200" />
+        <di:waypoint x="1240" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0r50jqm_di" bpmnElement="Flow_0r50jqm">
+        <di:waypoint x="1340" y="200" />
+        <di:waypoint x="1447" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_110o59f_di" bpmnElement="Flow_110o59f">
+        <di:waypoint x="1483" y="200" />
+        <di:waypoint x="1590" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dk_gw_di" bpmnElement="Flow_0dk_gw">
+        <di:waypoint x="1690" y="200" />
+        <di:waypoint x="1790" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_vor_ja_di" bpmnElement="F_k_vor_ja">
+        <di:waypoint x="1815" y="225" />
+        <di:waypoint x="1815" y="360" />
+        <di:waypoint x="1972" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_vor_essen_di" bpmnElement="F_k_vor_essen">
+        <di:waypoint x="2008" y="360" />
+        <di:waypoint x="2115" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_vor_join_di" bpmnElement="F_k_vor_join">
+        <di:waypoint x="2215" y="360" />
+        <di:waypoint x="2340" y="360" />
+        <di:waypoint x="2340" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_vor_nein_di" bpmnElement="F_k_vor_nein">
+        <di:waypoint x="1840" y="200" />
+        <di:waypoint x="2315" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_haupt1_di" bpmnElement="F_k_haupt1">
+        <di:waypoint x="2365" y="200" />
+        <di:waypoint x="2497" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_haupt2_di" bpmnElement="F_k_haupt2">
+        <di:waypoint x="2533" y="200" />
+        <di:waypoint x="2640" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_haupt3_di" bpmnElement="F_k_haupt3">
+        <di:waypoint x="2740" y="200" />
+        <di:waypoint x="2815" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_des_gw_di" bpmnElement="F_k_des_gw">
+        <di:waypoint x="2915" y="200" />
+        <di:waypoint x="3015" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_des_ja_di" bpmnElement="F_k_des_ja">
+        <di:waypoint x="3040" y="225" />
+        <di:waypoint x="3040" y="360" />
+        <di:waypoint x="3197" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_des_essen_di" bpmnElement="F_k_des_essen">
+        <di:waypoint x="3233" y="360" />
+        <di:waypoint x="3340" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_des_join_di" bpmnElement="F_k_des_join">
+        <di:waypoint x="3440" y="360" />
+        <di:waypoint x="3565" y="360" />
+        <di:waypoint x="3565" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_des_nein_di" bpmnElement="F_k_des_nein">
+        <di:waypoint x="3065" y="200" />
+        <di:waypoint x="3540" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_rech1_di" bpmnElement="F_k_rech1">
+        <di:waypoint x="3590" y="200" />
+        <di:waypoint x="3690" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_rech2_di" bpmnElement="F_k_rech2">
+        <di:waypoint x="3790" y="200" />
+        <di:waypoint x="3897" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_rech3_di" bpmnElement="F_k_rech3">
+        <di:waypoint x="3933" y="200" />
+        <di:waypoint x="4040" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_zahl_gw_di" bpmnElement="F_k_zahl_gw">
+        <di:waypoint x="4140" y="200" />
+        <di:waypoint x="4240" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_zahl_bar_di" bpmnElement="F_k_zahl_bar">
+        <di:waypoint x="4265" y="225" />
+        <di:waypoint x="4265" y="360" />
+        <di:waypoint x="4390" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_bar_join_di" bpmnElement="F_k_bar_join">
+        <di:waypoint x="4490" y="360" />
+        <di:waypoint x="4615" y="360" />
+        <di:waypoint x="4615" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_zahl_karte_di" bpmnElement="F_k_zahl_karte">
+        <di:waypoint x="4290" y="200" />
+        <di:waypoint x="4390" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_karte_join_di" bpmnElement="F_k_karte_join">
+        <di:waypoint x="4490" y="200" />
+        <di:waypoint x="4590" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_tip_gw_di" bpmnElement="F_k_tip_gw">
+        <di:waypoint x="4640" y="200" />
+        <di:waypoint x="4740" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_tip_gw2_di" bpmnElement="F_k_tip_gw2">
+        <di:waypoint x="4840" y="200" />
+        <di:waypoint x="4940" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_tip_ja_di" bpmnElement="F_k_tip_ja">
+        <di:waypoint x="4965" y="225" />
+        <di:waypoint x="4965" y="360" />
+        <di:waypoint x="5090" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_tip_join_di" bpmnElement="F_k_tip_join">
+        <di:waypoint x="5190" y="360" />
+        <di:waypoint x="5315" y="360" />
+        <di:waypoint x="5315" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_tip_nein_di" bpmnElement="F_k_tip_nein">
+        <di:waypoint x="4990" y="200" />
+        <di:waypoint x="5290" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_verl_di" bpmnElement="F_k_verl">
+        <di:waypoint x="5340" y="200" />
+        <di:waypoint x="5440" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_k_end_di" bpmnElement="F_k_end">
+        <di:waypoint x="5540" y="200" />
+        <di:waypoint x="5647" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vxovuk_di" bpmnElement="Flow_1vxovuk">
+        <di:waypoint x="258" y="640" />
+        <di:waypoint x="365" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nub9v5_di" bpmnElement="Flow_1nub9v5">
+        <di:waypoint x="465" y="640" />
+        <di:waypoint x="565" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0obqlmr_di" bpmnElement="Flow_0obqlmr">
+        <di:waypoint x="590" y="665" />
+        <di:waypoint x="590" y="800" />
+        <di:waypoint x="715" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_kp_end_di" bpmnElement="F_w_kp_end">
+        <di:waypoint x="815" y="800" />
+        <di:waypoint x="922" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1njhpym_di" bpmnElement="Flow_1njhpym">
+        <di:waypoint x="615" y="640" />
+        <di:waypoint x="715" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0pkkju6_di" bpmnElement="Flow_0pkkju6">
+        <di:waypoint x="815" y="640" />
+        <di:waypoint x="890" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1t8nt07_di" bpmnElement="Flow_1t8nt07">
+        <di:waypoint x="990" y="640" />
+        <di:waypoint x="1097" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03yqkre_di" bpmnElement="Flow_03yqkre">
+        <di:waypoint x="1133" y="640" />
+        <di:waypoint x="1240" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1emdvkc_di" bpmnElement="Flow_1emdvkc">
+        <di:waypoint x="1340" y="640" />
+        <di:waypoint x="1447" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_174gmv7_di" bpmnElement="Flow_174gmv7">
+        <di:waypoint x="1483" y="640" />
+        <di:waypoint x="1590" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uyp2uf_di" bpmnElement="Flow_0uyp2uf">
+        <di:waypoint x="1690" y="640" />
+        <di:waypoint x="1797" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07z0c7k_di" bpmnElement="Flow_07z0c7k">
+        <di:waypoint x="1833" y="640" />
+        <di:waypoint x="1965" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jgh3e8_di" bpmnElement="Flow_1jgh3e8">
+        <di:waypoint x="1990" y="665" />
+        <di:waypoint x="1990" y="800" />
+        <di:waypoint x="2115" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kol4h5_di" bpmnElement="Flow_0kol4h5">
+        <di:waypoint x="2215" y="800" />
+        <di:waypoint x="2340" y="800" />
+        <di:waypoint x="2340" y="665" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0aqqjkt_di" bpmnElement="Flow_0aqqjkt">
+        <di:waypoint x="2015" y="640" />
+        <di:waypoint x="2315" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xq8uge_di" bpmnElement="Flow_0xq8uge">
+        <di:waypoint x="2365" y="640" />
+        <di:waypoint x="2465" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_kueche_di" bpmnElement="F_w_kueche">
+        <di:waypoint x="2565" y="640" />
+        <di:waypoint x="2640" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_kfertig_di" bpmnElement="F_w_kfertig">
+        <di:waypoint x="2740" y="640" />
+        <di:waypoint x="2847" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_vor_di" bpmnElement="F_w_vor">
+        <di:waypoint x="2883" y="640" />
+        <di:waypoint x="2990" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_haupt_di" bpmnElement="F_w_haupt">
+        <di:waypoint x="3090" y="640" />
+        <di:waypoint x="3165" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_des_di" bpmnElement="F_w_des">
+        <di:waypoint x="3265" y="640" />
+        <di:waypoint x="3340" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_rechwait_di" bpmnElement="F_w_rechwait">
+        <di:waypoint x="3440" y="640" />
+        <di:waypoint x="3547" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_rechbring_di" bpmnElement="F_w_rechbring">
+        <di:waypoint x="3583" y="640" />
+        <di:waypoint x="3690" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_zahl_di" bpmnElement="F_w_zahl">
+        <di:waypoint x="3790" y="640" />
+        <di:waypoint x="3865" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_verab_di" bpmnElement="F_w_verab">
+        <di:waypoint x="3965" y="640" />
+        <di:waypoint x="4040" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_w_end_di" bpmnElement="F_w_end">
+        <di:waypoint x="4140" y="640" />
+        <di:waypoint x="4247" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ku_1_di" bpmnElement="F_ku_1">
+        <di:waypoint x="258" y="1010" />
+        <di:waypoint x="365" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ku_2_di" bpmnElement="F_ku_2">
+        <di:waypoint x="465" y="1010" />
+        <di:waypoint x="540" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ku_3_di" bpmnElement="F_ku_3">
+        <di:waypoint x="640" y="1010" />
+        <di:waypoint x="715" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ku_4_di" bpmnElement="F_ku_4">
+        <di:waypoint x="815" y="1010" />
+        <di:waypoint x="922" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1l7fvpo_di" bpmnElement="Flow_1l7fvpo">
+        <di:waypoint x="415" y="240" />
+        <di:waypoint x="415" y="470" />
+        <di:waypoint x="240" y="470" />
+        <di:waypoint x="240" y="622" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0x1x3bn_di" bpmnElement="Flow_0x1x3bn">
+        <di:waypoint x="765" y="600" />
+        <di:waypoint x="765" y="470" />
+        <di:waypoint x="590" y="470" />
+        <di:waypoint x="590" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u5mnl0_di" bpmnElement="Flow_0u5mnl0">
+        <di:waypoint x="940" y="600" />
+        <di:waypoint x="940" y="470" />
+        <di:waypoint x="940" y="470" />
+        <di:waypoint x="940" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1u85r12_di" bpmnElement="Flow_1u85r12">
+        <di:waypoint x="1115" y="240" />
+        <di:waypoint x="1115" y="470" />
+        <di:waypoint x="1115" y="470" />
+        <di:waypoint x="1115" y="622" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bsop1w_di" bpmnElement="Flow_1bsop1w">
+        <di:waypoint x="1640" y="600" />
+        <di:waypoint x="1640" y="470" />
+        <di:waypoint x="1465" y="470" />
+        <di:waypoint x="1465" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0p1bbym_di" bpmnElement="Flow_0p1bbym">
+        <di:waypoint x="1640" y="240" />
+        <di:waypoint x="1640" y="470" />
+        <di:waypoint x="1815" y="470" />
+        <di:waypoint x="1815" y="622" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_vor_di" bpmnElement="MF_vor">
+        <di:waypoint x="3040" y="600" />
+        <di:waypoint x="3040" y="470" />
+        <di:waypoint x="1990" y="470" />
+        <di:waypoint x="1990" y="378" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_haupt_di" bpmnElement="MF_haupt">
+        <di:waypoint x="3215" y="600" />
+        <di:waypoint x="3215" y="470" />
+        <di:waypoint x="2515" y="470" />
+        <di:waypoint x="2515" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_des_di" bpmnElement="MF_des">
+        <di:waypoint x="3390" y="600" />
+        <di:waypoint x="3390" y="470" />
+        <di:waypoint x="3215" y="470" />
+        <di:waypoint x="3215" y="378" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_rechreq_di" bpmnElement="MF_rechreq">
+        <di:waypoint x="3740" y="240" />
+        <di:waypoint x="3740" y="470" />
+        <di:waypoint x="3565" y="470" />
+        <di:waypoint x="3565" y="622" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_rechbring_di" bpmnElement="MF_rechbring">
+        <di:waypoint x="3740" y="600" />
+        <di:waypoint x="3740" y="470" />
+        <di:waypoint x="3915" y="470" />
+        <di:waypoint x="3915" y="218" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_ku_order_di" bpmnElement="MF_ku_order">
+        <di:waypoint x="2690" y="680" />
+        <di:waypoint x="2690" y="895" />
+        <di:waypoint x="240" y="895" />
+        <di:waypoint x="240" y="992" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_ku_fertig_di" bpmnElement="MF_ku_fertig">
+        <di:waypoint x="765" y="970" />
+        <di:waypoint x="765" y="895" />
+        <di:waypoint x="2865" y="895" />
+        <di:waypoint x="2865" y="658" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
