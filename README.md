@@ -1,55 +1,193 @@
-# Restaurantbestellprozess mit Camunda 8
+<div align="center">
 
-Projektarbeit M254. Modellierung und Ausführung eines Restaurantbesuchs als
-BPMN Prozess in Camunda 8, mit lokalem Webinterface als Kundensicht.
+# 🍽️ Restaurant Bestellprozess
 
-## Idee
+### Ein vollständig ausführbarer Geschäftsprozess in Camunda 8
+
+Projektarbeit Modul 254 · Technische Richtung · BPMN 2.0 in der Camunda Workflow Engine
+
+![Camunda](https://img.shields.io/badge/Camunda-8.9-orange)
+![BPMN](https://img.shields.io/badge/BPMN-2.0-blue)
+![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)
+![Status](https://img.shields.io/badge/Status-lauff%C3%A4hig-brightgreen)
+
+</div>
+
+---
+
+## Inhalt
+
+* [Über das Projekt](#über-das-projekt)
+* [Architektur](#architektur)
+* [Die drei Pools](#die-drei-pools)
+* [Ablauf einer Bestellung](#ablauf-einer-bestellung)
+* [Nachrichtenchoreografie](#nachrichtenchoreografie)
+* [Technik im Detail](#technik-im-detail)
+* [Installation und Start](#installation-und-start)
+* [Projektstruktur](#projektstruktur)
+* [Erfüllung der Anforderungen](#erfüllung-der-anforderungen)
+* [Technologie](#technologie)
+
+---
+
+## Über das Projekt
 
 Der komplette Ablauf eines Restaurantbesuchs, vom Betreten über Bestellung und
 Essen bis zur Zahlung, ist als ausführbarer BPMN Prozess modelliert. Ein Gast
-steuert den Ablauf über eine Weboberfläche. Camunda 8 führt den Prozess Schritt
-für Schritt aus und ist in Operate live nachvollziehbar.
+steuert den Ablauf über eine schlanke Weboberfläche. Camunda 8 führt den Prozess
+Schritt für Schritt aus, und in Camunda Operate lässt sich live mitverfolgen, wie
+der Token durch das Modell wandert.
 
-## Aufbau
+Das Projekt verbindet damit drei Welten: die fachliche Modellierung in BPMN 2.0,
+die technische Ausführung in der Camunda Workflow Engine und eine eigene
+Weboberfläche als Benutzerschnittstelle.
 
-Die BPMN Collaboration besteht aus drei Pools:
+<div align="center">
+  <img src="screenshots/modeler/01_gesamt_bpmn.png" alt="Gesamtes BPMN Modell mit drei Pools" width="90%">
+  <br><em>Das vollständige Kollaborationsdiagramm mit den Pools Kunde, Kellner und Küche</em>
+</div>
 
-* **Kunde** (`Process_0t4z7yo`): Ausführbarer Hauptprozess, steuert den ganzen Ablauf.
-* **Kellner** (`Process_14ksr0u`): Beschreibt die Interaktionen des Kellners.
-* **Küche** (`Process_kueche`): Beschreibt die Abläufe in der Küche.
+---
 
-Der Kunde Prozess ist der ausführbare Kern. Kellner und Küche kommunizieren über
-BPMN Nachrichten mit ihm. Der Correlation Key dafür ist `bestellId`.
+## Architektur
 
-## Komponenten
+Die Lösung besteht aus drei Schichten, die über REST miteinander sprechen.
 
-* **`Camunda_Projektarbeit.bpmn`**: Das Prozessmodell (Collaboration mit drei Pools).
-* **`server.js`**: Node.js Backend. Spricht per REST API (v2) mit Camunda 8,
-  arbeitet die Service Tasks als Job Worker ab und treibt Kellner und Küche über
-  Nachrichten an.
-* **`public/index.html`**: Weboberfläche (Kundensicht). Bestellung starten,
-  Getränk, Essen und Dessert wählen, zahlen. Kellner und Küche laufen automatisch
-  im Hintergrund.
+```
+┌────────────────────────────────────────────────────────┐
+│   Weboberfläche   ·   Kundensicht   ·   localhost:3000  │
+│   Bestellung starten, Getränk, Essen, Dessert, Zahlung  │
+└────────────────────────────────────────────────────────┘
+                          │  REST
+                          ▼
+┌────────────────────────────────────────────────────────┐
+│   Backend   ·   server.js   ·   Node.js und Express     │
+│   Job Worker   +   Nachrichten   +   Formulardaten      │
+└────────────────────────────────────────────────────────┘
+                          │  Camunda REST API v2
+                          ▼
+┌────────────────────────────────────────────────────────┐
+│   Camunda 8   ·   Zeebe Engine   ·   localhost:8080     │
+│                                                         │
+│     Pool Kunde     ausführbar, steuert den Ablauf       │
+│     Pool Kellner   fachlich modelliert                  │
+│     Pool Küche     fachlich modelliert                  │
+└────────────────────────────────────────────────────────┘
+```
 
-## Technischer Ablauf
+Der Kunde Prozess ist der ausführbare Kern. Kellner und Küche sind fachlich
+vollständig modelliert und über Nachrichten mit dem Kunden verbunden.
 
-1. Der Gast startet über das Webinterface eine Bestellung. Camunda erzeugt eine
-   Prozessinstanz des Kunde Prozesses.
-2. Service Tasks (zum Beispiel Restaurant betreten, Bestellung aufgeben, bezahlen)
-   werden vom Backend als Job Worker automatisch abgearbeitet.
-3. Nutzereingaben (Personenzahl, Getränk, Essen, Dessert, Zahlungsart, Trinkgeld)
-   laufen über User Tasks und die passenden Formulare im Webinterface.
-4. Kellner und Küche werden über BPMN Nachrichten synchronisiert, die das Backend
-   zum richtigen Zeitpunkt publiziert.
-5. In Operate ist live sichtbar, wie der Token durch den Prozess wandert.
+---
 
-## Voraussetzungen
+## Die drei Pools
 
-* **Node.js 18+** (für globales `fetch`)
-* **Camunda 8 Run** läuft lokal (Operate erreichbar unter http://localhost:8080/operate)
-* Das **BPMN ist deployed** (aktuelle Version im Modeler deployen)
+### Pool Kunde (ausführbar)
 
-## Starten
+Das Herzstück. Er enthält den kompletten Besuch von Anfang bis Ende.
+
+* **1 Startereignis:** Hunger o.ä
+* **11 Service Tasks**, die das Backend automatisch abarbeitet: Restaurant
+  betreten, an Tisch setzen, Bestellung aufgeben, Vorspeise essen, Hauptgang
+  essen, Dessert essen, Rechnung verlangen, bar bezahlen, mit Karte bezahlen,
+  Trinkgeld geben, Restaurant verlassen
+* **6 User Tasks** mit Eingabe im Webinterface: Personenzahl, Getränk, Essen,
+  Dessert, Zahlungsart, Trinkgeld
+* **8 wartende Zwischenereignisse**, die je auf eine Nachricht vom Kellner warten
+* **8 Gateways** für die Entscheidungen: Vorspeise gewünscht, Dessert gewünscht,
+  bar oder Karte, Trinkgeld ja oder nein
+* **1 Endereignis:** Besuch abgeschlossen
+
+### Pool Kellner
+
+Bildet die Arbeit des Kellners fachlich ab. Enthält 16 Aufgaben von "Nach
+Personenzahl fragen" über "Bestellung aufnehmen" und "Bestellung eintippen
+(iPad)" bis "Gäste verabschieden", dazu die Entscheidung "Genug Plätze frei?" mit
+einem eigenen Ende "Kein Platz" für den Fall, dass das Restaurant voll ist.
+
+### Pool Küche
+
+Der kompakte dritte Pool: Bestellung erhalten, Gerichte zubereiten, Gericht
+anrichten, als fertig markieren, Bestellung bereit.
+
+---
+
+## Ablauf einer Bestellung
+
+Jeder Schritt im Webinterface entspricht einem Element im Prozess. Die folgenden
+Aufnahmen zeigen einen kompletten Durchlauf mit zwei Personen.
+
+<div align="center">
+
+<table>
+<tr>
+<td align="center"><strong>Personenzahl</strong><br><img src="screenshots/web/01_personenzahl.png" width="260"></td>
+<td align="center"><strong>Getränk</strong><br><img src="screenshots/web/02_getraenk.png" width="260"></td>
+<td align="center"><strong>Essen</strong><br><img src="screenshots/web/04_essen.png" width="260"></td>
+</tr>
+<tr>
+<td align="center"><strong>Dessert</strong><br><img src="screenshots/web/05_dessert.png" width="260"></td>
+<td align="center"><strong>Zahlungsart</strong><br><img src="screenshots/web/06_zahlungsart.png" width="260"></td>
+<td align="center"><strong>Trinkgeld</strong><br><img src="screenshots/web/07_trinkgeld.png" width="260"></td>
+</tr>
+</table>
+
+</div>
+
+Am Ende steht die fertige Rechnung mit Zwischensumme, Trinkgeld und Zahlungsart.
+
+<div align="center">
+  <img src="screenshots/web/08_rechnung_final.png" alt="Fertige Rechnung" width="60%">
+</div>
+
+---
+
+## Nachrichtenchoreografie
+
+Kunde, Kellner und Küche synchronisieren sich über acht Nachrichten. Der
+gemeinsame Correlation Key ist `bestellId`, damit bei mehreren Gästen jede
+Nachricht der richtigen Bestellung zugeordnet wird.
+
+```
+ Kellner  ──▶  KellnerFragtPersonenzahl     ──▶  Kunde
+ Kellner  ──▶  TischZugewiesen              ──▶  Kunde
+ Kellner  ──▶  KellnerFragtGetraenk         ──▶  Kunde
+ Kellner  ──▶  KellnerNimmtBestellungAuf    ──▶  Kunde
+ Kellner  ──▶  Bestellung eintippen (iPad)  ──▶  Küche
+ Küche    ──▶  Bestellung fertig            ──▶  Kellner
+ Kellner  ──▶  VorspeiseServiert            ──▶  Kunde
+ Kellner  ──▶  HauptgangServiert            ──▶  Kunde
+ Kellner  ──▶  DessertServiert              ──▶  Kunde
+ Kellner  ──▶  RechnungGebracht             ──▶  Kunde
+```
+
+---
+
+## Technik im Detail
+
+* **Job Worker Prinzip.** Jeder Service Task trägt einen Job Type, zum Beispiel
+  `bestellung-aufgeben` oder `karte-bezahlen`. Das Backend meldet sich per Long
+  Poll bei Camunda, holt die passenden Jobs und schliesst sie ab. Das sind die
+  gemockten API Calls für die automatischen Schritte.
+* **Correlation Key.** Die Variable `bestellId` verbindet alle Nachrichten mit
+  der richtigen Prozessinstanz.
+* **Prozessvariablen.** `personen`, `tischNr`, `getraenk`, `hauptgericht`,
+  `vorspeiseGewuenscht`, `dessertGewuenscht`, `zahlungsart`, `trinkgeldProzent`.
+* **User Tasks.** Die sechs Eingabeschritte werden über die Weboberfläche bedient,
+  die die User Tasks per REST abschliesst.
+* **Camunda REST API v2.** Ohne Authentifizierung, wie im lokalen Camunda 8 Run
+  Standard.
+
+<div align="center">
+  <img src="screenshots/modeler/02_servicetask_jobtype.png" alt="Service Task mit Job Type" width="70%">
+  <br><em>Ein Service Task mit hinterlegtem Job Type als Nachweis der API Anbindung</em>
+</div>
+
+---
+
+## Installation und Start
+
+Voraussetzungen: Node.js 18 oder neuer und ein lokal laufendes Camunda 8 Run.
 
 ```powershell
 # 1. Camunda 8 Run starten (im Verzeichnis des Bundles)
@@ -58,14 +196,17 @@ BPMN Nachrichten mit ihm. Der Correlation Key dafür ist `bestellId`.
 
 # 2. BPMN im Camunda Modeler deployen (Raketensymbol)
 
-# 3. Backend und Webinterface starten
+# 3. Backend und Weboberfläche starten
 npm install
 npm start
 ```
 
-Dann im Browser: http://localhost:3000
+Danach im Browser öffnen:
 
-Beim Start prüft das Backend die Verbindung und gibt im Terminal aus:
+* Weboberfläche: http://localhost:3000
+* Camunda Operate: http://localhost:8080/operate
+
+Beim Start bestätigt das Backend die Verbindung im Terminal:
 
 ```
 Verbindung zu Camunda ok (http://localhost:8080/v2), Broker: 1
@@ -73,13 +214,61 @@ Job Worker gestartet
 Webinterface: http://localhost:3000
 ```
 
-## Wichtigste Prozessvariablen
+---
 
-* `bestellId`: Correlation Key für alle Nachrichten (automatisch gesetzt).
-* `getraenk`, `hauptgericht`: Auswahl des Gasts.
-* `vorspeiseGewuenscht`, `dessertGewuenscht`: Steuern die Verzweigungen.
-* `zahlungsart`, `trinkgeldProzent`: Zahlung und Trinkgeld.
+## Projektstruktur
+
+```
+restaurant-camunda/
+├─ Camunda_Projektarbeit.bpmn      Das Prozessmodell mit drei Pools
+├─ server.js                       Backend, Job Worker und Nachrichten
+├─ package.json                    Abhängigkeiten und Startskript
+├─ public/
+│  └─ index.html                   Weboberfläche, Kundensicht
+└─ screenshots/                    Nachweise für die Abgabe
+   ├─ modeler/                     BPMN im Modeler
+   ├─ web/                         Durchlauf im Webinterface
+   ├─ operate/                     Deployment und Instanz
+   ├─ terminal/                    Backend Log
+   └─ adonis/                      Prozesslandkarte und Organigramm
+```
+
+---
+
+## Erfüllung der Anforderungen
+
+Die technische Richtung des Moduls verlangt acht Punkte. Jeder ist belegt.
+
+* ✅ **Prozesslandkarte in Adonis** mit Management, Kern und Unterstützung.
+  Beleg: `screenshots/adonis/01_prozesslandkarte.png`
+* ✅ **Ausführbarer Prozess in der Camunda Workflow Engine.**
+  Beleg: `Camunda_Projektarbeit.bpmn` und `screenshots/modeler/01_gesamt_bpmn.png`
+* ✅ **Sinnvolle Einbettung in die Prozesslandkarte** als Kernprozess.
+  Beleg: `screenshots/adonis/01_prozesslandkarte.png` und `screenshots/adonis/02_organigramm.png`
+* ✅ **Anreicherung mit Attributen und Variablen.**
+  Beleg: `screenshots/modeler/02_servicetask_jobtype.png` und das Variables Panel in Operate
+* ✅ **Forms für die User Tasks.** Sechs Eingabeschritte im Webinterface.
+  Beleg: `screenshots/web/01_personenzahl.png` bis `07_trinkgeld.png`
+* ✅ **Gemockte API Calls für die automatischen Schritte** über Job Worker.
+  Beleg: `server.js` und `screenshots/terminal/02_durchlauf.png`
+* ✅ **Testen des Prozesses** mit einem vollständigen Durchlauf.
+  Beleg: `screenshots/operate/02_instanz_fertig.png`
+* ✅ **Deployen und Demonstrieren.**
+  Beleg: `screenshots/operate/01_prozessversion.png`
+
+<div align="center">
+  <img src="screenshots/operate/02_instanz_fertig.png" alt="Durchgelaufene Instanz in Operate" width="90%">
+  <br><em>Eine Instanz in Camunda Operate mit Verlauf und Prozessvariablen</em>
+</div>
+
+---
 
 ## Technologie
 
-Camunda 8.9 · BPMN 2.0 · Node.js · Express · Camunda REST API v2
+Camunda 8.9 · BPMN 2.0 · Node.js · Express · Camunda REST API v2 · Adonis
+
+<div align="center">
+  <br>
+  <strong>Projektarbeit Modul 254</strong><br>
+  Technische Richtung mit Camunda
+</div>
