@@ -43,7 +43,7 @@ die technische Ausführung in der Camunda Workflow Engine und eine eigene
 Weboberfläche als Benutzerschnittstelle.
 
 <div align="center">
-  <img src="screenshots/modeler/01_gesamt_bpmn.png" alt="Gesamtes BPMN Modell mit drei Pools" width="90%">
+  <img src="Files/Screenshots/modeler/01_gesamt_bpmn.png" alt="Gesamtes BPMN Modell mit drei Pools" width="90%">
   <br><em>Das vollständige Kollaborationsdiagramm mit den Pools Kunde, Kellner und Küche</em>
 </div>
 
@@ -121,14 +121,14 @@ Aufnahmen zeigen einen kompletten Durchlauf mit zwei Personen.
 
 <table>
 <tr>
-<td align="center"><strong>Personenzahl</strong><br><img src="screenshots/web/01_personenzahl.png" width="260"></td>
-<td align="center"><strong>Getränk</strong><br><img src="screenshots/web/02_getraenk.png" width="260"></td>
-<td align="center"><strong>Essen</strong><br><img src="screenshots/web/04_essen.png" width="260"></td>
+<td align="center"><strong>Personenzahl</strong><br><img src="Files/Screenshots/web/01_personenzahl.png" width="260"></td>
+<td align="center"><strong>Getränk</strong><br><img src="Files/Screenshots/web/02_getraenk.png" width="260"></td>
+<td align="center"><strong>Essen</strong><br><img src="Files/Screenshots/web/04_essen.png" width="260"></td>
 </tr>
 <tr>
-<td align="center"><strong>Dessert</strong><br><img src="screenshots/web/05_dessert.png" width="260"></td>
-<td align="center"><strong>Zahlungsart</strong><br><img src="screenshots/web/06_zahlungsart.png" width="260"></td>
-<td align="center"><strong>Trinkgeld</strong><br><img src="screenshots/web/07_trinkgeld.png" width="260"></td>
+<td align="center"><strong>Dessert</strong><br><img src="Files/Screenshots/web/05_dessert.png" width="260"></td>
+<td align="center"><strong>Zahlungsart</strong><br><img src="Files/Screenshots/web/06_zahlungsart.png" width="260"></td>
+<td align="center"><strong>Trinkgeld</strong><br><img src="Files/Screenshots/web/07_trinkgeld.png" width="260"></td>
 </tr>
 </table>
 
@@ -137,7 +137,7 @@ Aufnahmen zeigen einen kompletten Durchlauf mit zwei Personen.
 Am Ende steht die fertige Rechnung mit Zwischensumme, Trinkgeld und Zahlungsart.
 
 <div align="center">
-  <img src="screenshots/web/08_rechnung_final.png" alt="Fertige Rechnung" width="60%">
+  <img src="Files/Screenshots/web/08_rechnung_final.png" alt="Fertige Rechnung" width="60%">
 </div>
 
 ---
@@ -179,7 +179,7 @@ Nachricht der richtigen Bestellung zugeordnet wird.
   Standard.
 
 <div align="center">
-  <img src="screenshots/modeler/02_servicetask_jobtype.png" alt="Service Task mit Job Type" width="70%">
+  <img src="Files/Screenshots/modeler/02_servicetask_jobtype.png.png" alt="Service Task mit Job Type" width="70%">
   <br><em>Ein Service Task mit hinterlegtem Job Type als Nachweis der API Anbindung</em>
 </div>
 
@@ -219,18 +219,19 @@ Webinterface: http://localhost:3000
 ## Projektstruktur
 
 ```
-restaurant-camunda/
-├─ Camunda_Projektarbeit.bpmn      Das Prozessmodell mit drei Pools
-├─ server.js                       Backend, Job Worker und Nachrichten
-├─ package.json                    Abhängigkeiten und Startskript
-├─ public/
-│  └─ index.html                   Weboberfläche, Kundensicht
-└─ screenshots/                    Nachweise für die Abgabe
-   ├─ modeler/                     BPMN im Modeler
-   ├─ web/                         Durchlauf im Webinterface
-   ├─ operate/                     Deployment und Instanz
-   ├─ terminal/                    Backend Log
-   └─ adonis/                      Prozesslandkarte und Organigramm
+M254/
+├─ README.md                          Diese Projektvorstellung
+├─ Aufsetzen.md                       Anleitung zum Aufsetzen
+└─ Files/
+   ├─ 00_Finlal-project/
+   │  ├─ Camunda_Projektarbeit.bpmn   Das Prozessmodell mit drei Pools
+   │  └─ webserver.zip                Backend und Weboberfläche
+   └─ Screenshots/                    Nachweise für die Abgabe
+      ├─ adonis/                      Prozesslandkarte und Organigramm
+      ├─ modeler/                     BPMN im Modeler
+      ├─ operate/                     Deployment und Instanz
+      ├─ terminal/                    Backend Log
+      └─ web/                         Durchlauf im Webinterface
 ```
 
 ---
@@ -240,24 +241,24 @@ restaurant-camunda/
 Die technische Richtung des Moduls verlangt acht Punkte. Jeder ist belegt.
 
 * ✅ **Prozesslandkarte in Adonis** mit Management, Kern und Unterstützung.
-  Beleg: `screenshots/adonis/01_prozesslandkarte.png`
+  Beleg: `Files/Screenshots/adonis/01_prozesslandkarte.png`
 * ✅ **Ausführbarer Prozess in der Camunda Workflow Engine.**
-  Beleg: `Camunda_Projektarbeit.bpmn` und `screenshots/modeler/01_gesamt_bpmn.png`
+  Beleg: `Camunda_Projektarbeit.bpmn` und `Files/Screenshots/modeler/01_gesamt_bpmn.png`
 * ✅ **Sinnvolle Einbettung in die Prozesslandkarte** als Kernprozess.
-  Beleg: `screenshots/adonis/01_prozesslandkarte.png` und `screenshots/adonis/02_organigramm.png`
+  Beleg: `Files/Screenshots/adonis/01_prozesslandkarte.png` und `Files/Screenshots/adonis/02_organigramm.png`
 * ✅ **Anreicherung mit Attributen und Variablen.**
-  Beleg: `screenshots/modeler/02_servicetask_jobtype.png` und das Variables Panel in Operate
+  Beleg: `Files/Screenshots/modeler/02_servicetask_jobtype.png` und das Variables Panel in Operate
 * ✅ **Forms für die User Tasks.** Sechs Eingabeschritte im Webinterface.
-  Beleg: `screenshots/web/01_personenzahl.png` bis `07_trinkgeld.png`
+  Beleg: `Files/Screenshots/web/01_personenzahl.png` bis `07_trinkgeld.png`
 * ✅ **Gemockte API Calls für die automatischen Schritte** über Job Worker.
-  Beleg: `server.js` und `screenshots/terminal/02_durchlauf.png`
+  Beleg: `server.js` und `Files/Screenshots/terminal/02_durchlauf.png`
 * ✅ **Testen des Prozesses** mit einem vollständigen Durchlauf.
-  Beleg: `screenshots/operate/02_instanz_fertig.png`
+  Beleg: `Files/Screenshots/operate/02_instanz_fertig.png`
 * ✅ **Deployen und Demonstrieren.**
-  Beleg: `screenshots/operate/01_prozessversion.png`
+  Beleg: `Files/Screenshots/operate/01_prozessversion.png`
 
 <div align="center">
-  <img src="screenshots/operate/02_instanz_fertig.png" alt="Durchgelaufene Instanz in Operate" width="90%">
+  <img src="Files/Screenshots/operate/02_instanz_fertig.png" alt="Durchgelaufene Instanz in Operate" width="90%">
   <br><em>Eine Instanz in Camunda Operate mit Verlauf und Prozessvariablen</em>
 </div>
 
